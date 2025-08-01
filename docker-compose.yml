@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./converted:/app/converted
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=converter
+      - MYSQL_PASSWORD=converter123
+      - MYSQL_DATABASE=file_converter
+    depends_on:
+      - db
+    networks:
+      - converter-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./uploads:/var/www/uploads
+      - ./converted:/var/www/converted
+    depends_on:
+      - web
+    networks:
+      - converter-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=file_converter
+      - MYSQL_USER=converter
+      - MYSQL_PASSWORD=converter123
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - converter-network
+
+volumes:
+  mysql_data:
+
+networks:
+  converter-network:
+    driver: bridge 
