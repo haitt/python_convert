@@ -9,9 +9,14 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Setup logging
+log_formatter = logging.Formatter(
+    '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+)
+
+file_handler = logging.FileHandler('app.log')
+file_handler.setFormatter(log_formatter)
+file_handler.setLevel(logging.DEBUG)  # Log all levels
 
 app = Flask(__name__)
 CORS(app)
@@ -20,8 +25,11 @@ CORS(app)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['CONVERTED_FOLDER'] = 'converted'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://converter:converter123@db/file_converter'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{os.getenv("MYSQL_USER")}:{os.getenv("MYSQL_PASSWORD")}@{os.getenv("MYSQL_HOST")}/{os.getenv("MYSQL_DATABASE")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Gắn vào Flask app logger
+app.logger.setLevel(logging.DEBUG)
+app.logger.addHandler(file_handler)
 
 # Ensure directories exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -92,20 +100,20 @@ def convert_file(conversion_id):
             if result.returncode == 0:
                 conversion.status = 'completed'
                 conversion.completed_at = datetime.utcnow()
-                logger.info(f"Conversion completed successfully: {conversion.original_filename}")
+                app.logger.info(f"Conversion completed successfully: {conversion.original_filename}")
             else:
                 conversion.status = 'failed'
                 conversion.error_message = f"LibreOffice conversion failed: {result.stderr}"
-                logger.error(f"Conversion failed: {result.stderr}")
+                app.logger.error(f"Conversion failed: {result.stderr}")
                 
         except subprocess.TimeoutExpired:
             conversion.status = 'failed'
             conversion.error_message = "Conversion timed out after 5 minutes"
-            logger.error("Conversion timed out")
+            app.logger.error("Conversion timed out")
         except Exception as e:
             conversion.status = 'failed'
             conversion.error_message = str(e)
-            logger.error(f"Conversion error: {str(e)}")
+            app.logger.error(f"Conversion error: {str(e)}")
         finally:
             db.session.commit()
 
@@ -115,6 +123,7 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    app.logger.info("Upload file request received")
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -171,7 +180,7 @@ def upload_file():
         }), 200
         
     except Exception as e:
-        logger.error(f"Upload error: {str(e)}")
+        app.logger.error(f"Upload error: {str(e)}")
         return jsonify({'error': 'Upload failed'}), 500
 
 @app.route('/status/<int:conversion_id>')
@@ -184,7 +193,7 @@ def get_status(conversion_id):
         return jsonify(conversion.to_dict()), 200
         
     except Exception as e:
-        logger.error(f"Status check error: {str(e)}")
+        app.logger.error(f"Status check error: {str(e)}")
         return jsonify({'error': 'Status check failed'}), 500
 
 @app.route('/download/<int:conversion_id>')
@@ -204,7 +213,7 @@ def download_file(conversion_id):
         return send_file(file_path, as_attachment=True, download_name=conversion.converted_filename)
         
     except Exception as e:
-        logger.error(f"Download error: {str(e)}")
+        app.logger.error(f"Download error: {str(e)}")
         return jsonify({'error': 'Download failed'}), 500
 
 @app.route('/conversions')
@@ -214,7 +223,7 @@ def list_conversions():
         return jsonify([conv.to_dict() for conv in conversions]), 200
         
     except Exception as e:
-        logger.error(f"List conversions error: {str(e)}")
+        app.logger.error(f"List conversions error: {str(e)}")
         return jsonify({'error': 'Failed to list conversions'}), 500
 
 if __name__ == '__main__':
