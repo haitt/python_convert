@@ -198,6 +198,8 @@ def get_status(conversion_id):
 
 @app.route('/download/<int:conversion_id>')
 def download_file(conversion_id):
+    app.logger.info(f"Download file request received: {conversion_id}")
+    print(f"Download file request received: {conversion_id}")
     try:
         conversion = Conversion.query.get(conversion_id)
         if not conversion:
@@ -207,7 +209,9 @@ def download_file(conversion_id):
             return jsonify({'error': 'Conversion not completed'}), 400
         
         file_path = os.path.join(app.config['CONVERTED_FOLDER'], conversion.converted_filename)
+        app.logger.info(f"Downloading file: {file_path}")
         if not os.path.exists(file_path):
+            app.logger.error(f"Converted file not found: {file_path}")
             return jsonify({'error': 'Converted file not found'}), 404
         
         return send_file(file_path, as_attachment=True, download_name=conversion.converted_filename)

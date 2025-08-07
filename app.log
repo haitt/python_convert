@@ -1,2 +1,20 @@
 [2025-08-04 08:04:37,432] INFO in app: Upload file request received
 [2025-08-04 08:04:39,809] INFO in app: Conversion completed successfully: 80b48540-4192-466a-a43c-a9434cd4ce25.doc
+[2025-08-04 08:36:04,638] INFO in app: Upload file request received
+[2025-08-04 08:36:06,857] INFO in app: Conversion completed successfully: d4f3830a-3a88-4bb8-bb26-44d257b6518a.doc
+[2025-08-04 10:24:03,897] INFO in app: Test route called
+[2025-08-04 10:24:25,090] INFO in app: Download file request received: 14
+[2025-08-04 10:24:25,211] INFO in app: Downloading file: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:24:25,216] ERROR in app: Converted file not found: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:25:44,067] INFO in app: Download file request received: 14
+[2025-08-04 10:25:44,095] INFO in app: Downloading file: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:25:44,102] ERROR in app: Converted file not found: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:25:45,631] INFO in app: Download file request received: 14
+[2025-08-04 10:25:45,645] INFO in app: Downloading file: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:25:45,652] ERROR in app: Converted file not found: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:25:46,911] INFO in app: Download file request received: 14
+[2025-08-04 10:25:46,919] INFO in app: Downloading file: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-04 10:25:46,927] ERROR in app: Converted file not found: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-05 02:55:09,339] INFO in app: Download file request received: 14
+[2025-08-05 02:55:09,424] INFO in app: Downloading file: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
+[2025-08-05 02:55:09,428] ERROR in app: Converted file not found: converted/d3fe4937-9ad2-45d0-bd5c-e7a1acf37eef.pdf
