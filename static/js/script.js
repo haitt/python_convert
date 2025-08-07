@@ -12,12 +12,10 @@ const convertBtn = document.getElementById('convertBtn');
 const progressSection = document.getElementById('progressSection');
 const resultsSection = document.getElementById('resultsSection');
 const errorSection = document.getElementById('errorSection');
-const conversionsList = document.getElementById('conversionsList');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
-    loadRecentConversions();
 });
 
 // Setup event listeners
@@ -245,7 +243,6 @@ async function checkConversionStatus() {
                 clearInterval(statusCheckInterval);
                 statusCheckInterval = null;
                 showSuccessResult();
-                loadRecentConversions();
             } else if (result.status === 'failed') {
                 clearInterval(statusCheckInterval);
                 statusCheckInterval = null;
@@ -328,51 +325,6 @@ function resetForm() {
         clearInterval(statusCheckInterval);
         statusCheckInterval = null;
     }
-}
-
-// Load recent conversions
-async function loadRecentConversions() {
-    try {
-        const response = await fetch('/conversions');
-        const conversions = await response.json();
-        
-        if (response.ok) {
-            displayConversions(conversions);
-        } else {
-            throw new Error('Failed to load conversions');
-        }
-        
-    } catch (error) {
-        console.error('Load conversions error:', error);
-        conversionsList.innerHTML = '<div class="loading">Failed to load recent conversions</div>';
-    }
-}
-
-// Display conversions
-function displayConversions(conversions) {
-    if (conversions.length === 0) {
-        conversionsList.innerHTML = '<div class="loading">No recent conversions</div>';
-        return;
-    }
-    
-    const html = conversions.map(conversion => `
-        <div class="conversion-item">
-            <div class="conversion-info">
-                <div class="conversion-icon ${conversion.conversion_type === 'pdf_to_word' ? 'pdf' : 'word'}">
-                    <i class="fas fa-${conversion.conversion_type === 'pdf_to_word' ? 'file-pdf' : 'file-word'}"></i>
-                </div>
-                <div class="conversion-details">
-                    <h4>${conversion.original_filename}</h4>
-                    <p>${new Date(conversion.created_at).toLocaleString()}</p>
-                </div>
-            </div>
-            <div class="conversion-status ${conversion.status}">
-                ${conversion.status.charAt(0).toUpperCase() + conversion.status.slice(1)}
-            </div>
-        </div>
-    `).join('');
-    
-    conversionsList.innerHTML = html;
 }
 
 // Utility function to show notifications
