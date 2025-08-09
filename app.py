@@ -147,22 +147,22 @@ def upload_file():
         
         # Generate unique filename
         file_extension = file.filename.rsplit('.', 1)[1].lower()
-        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        filename = uuid.uuid4()
+        unique_filename = f"{filename}.{file_extension}"
         
         # Save uploaded file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(file_path)
-        
-        # Determine output filename
+
         if conversion_type == 'pdf_to_word':
-            output_filename = f"{uuid.uuid4()}.docx"
+            converted_filename = f"{filename}.docx"
         else:
-            output_filename = f"{uuid.uuid4()}.pdf"
+            converted_filename = f"{filename}.pdf"
         
         # Create database record
         conversion = Conversion(
             original_filename=unique_filename,
-            converted_filename=output_filename,
+            converted_filename=converted_filename,
             conversion_type=conversion_type
         )
         db.session.add(conversion)
